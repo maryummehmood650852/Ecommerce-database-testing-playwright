@@ -13,17 +13,22 @@ jobs:
 
     services:
       sqlserver:
-        image: mcr.microsoft.com/mssql/server:2025-latest
+        image: mcr.microsoft.com/mssql/server:2022-latest
         env:
           ACCEPT_EULA: Y
-          MSSQL_SA_PASSWORD: YourStr0ngP@ssword123!
+          MSSQL_SA_PASSWORD: "YourStr0ng@Pass123!"
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStr0ngP@ssword123!' -C -Q 'SELECT 1'"
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd
+          -S localhost
+          -U sa
+          -P 'YourStr0ng@Pass123!'
+          -C
+          -Q 'SELECT 1'"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 20
+          --health-retries 30
 
     steps:
       - uses: actions/checkout@v6
@@ -35,15 +40,35 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install SQL Server tools
+        run: |
+          curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl -sSL https://packages.microsoft.com/config/ubuntu/24.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev
+          echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+
+      - name: Setup ECommerceDB
+        env:
+          DB_PASSWORD: "YourStr0ng@Pass123!"
+        run: |
+          sqlcmd \
+            -S localhost,1433 \
+            -U sa \
+            -P "$DB_PASSWORD" \
+            -C \
+            -i sql/setup.sql
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
         env:
+          CI: true
           DB_SERVER: localhost
           DB_PORT: 1433
           DB_USER: sa
-          DB_PASSWORD: YourStr0ngP@ssword123!
+          DB_PASSWORD: "YourStr0ng@Pass123!"
           DB_NAME: ECommerceDB
         run: npx playwright test
 
@@ -53,3 +78,4 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+ 
