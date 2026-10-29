@@ -48,7 +48,7 @@ The database includes the following tables:
 
 ## Key Learning Outcomes
 - Writing SQL queries for data validation.
-- Understanding relational database relationships.
+- - Understand relational database structures. 
 - Checking data integrity and foreign-key constraints.
 - Validating customer, product, and order information.
 - Understanding the relationship between UI testing and database testing.
