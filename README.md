@@ -6,7 +6,7 @@ This project focuses on database validation for an e-commerce system using SQL S
 Playwright and TypeScript are also used for automated testing of relevant e-commerce workflows where applicable.
 
 ## Project Objectives
-- Understand relational database structures.
+- Understand relational database structures. 
 - Validate data integrity using SQL queries.
 - Verify relationships between database tables.
 - Check product prices and customer-order associations.
